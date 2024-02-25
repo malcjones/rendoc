@@ -1,16 +1,9 @@
-// for now RENDOC does one file at a time
-// TODO: add support for multiple files
-// TODO: templates; e.g. docs == ['README.md', 'ARCHITECTURE.md']
-
-use comrak::{markdown_to_html, ComrakOptions};
 use maud::{html, Markup, PreEscaped, DOCTYPE};
+use pulldown_cmark::{html, Options, Parser};
 
 fn render_to_markup(file: &str) -> Markup {
     let markdown_input = std::fs::read_to_string(file).unwrap();
-    let html_output = markdown_to_html(&markdown_input, &ComrakOptions::default());
-    html! {
-        (PreEscaped(html_output))
-    }
+    html! { (PreEscaped(render_markdown(&markdown_input))) }
 }
 
 fn style() -> Markup {
@@ -19,10 +12,21 @@ fn style() -> Markup {
 r#"
 body {
     font-family: sans-serif;
-    color: #333;
-    background-color: #f8f8f8;
+    color: #073642; /* Solarized base02 for higher contrast */
+    background-color: #fdf6e3; /* Solarized base3 */
     margin: auto;
     max-width: 70%;
+}
+
+pre {
+    font-family: 'Courier New', Courier, monospace; /* A common monospace font */
+    background-color: #eee8d5; /* Solarized base2 */
+    color: #586e75; /* Solarized base01 for better contrast in pre blocks */
+    padding: 10px;
+    border-left: 5px solid #93a1a1; /* Solarized base1 */
+    overflow: auto;
+    border-radius: 4px; /* Rounded corners */
+    box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.05); /* Slight inner shadow */
 }
 "#
         }
@@ -37,38 +41,25 @@ fn template(markup: Markup, title: &str) -> Markup {
                 title { (title) }
                 (style())
             }
-            body {
-                (markup)
-            }
+            body { (markup) }
         }
     }
 }
 
-fn stub(path: &str) -> String {
-    path.split('/')
-        .last()
-        .unwrap()
-        .split('.')
-        .next()
-        .unwrap()
-        .to_string()
-}
-
 fn save_markup_to_file(markup: Markup, file: &str) {
-    let title = stub(file);
-    let html = template(markup, &title);
-    let html = html.into_string();
-
+    let title = file.rsplit('/').next().unwrap().split('.').next().unwrap();
+    let html = template(markup, title).into_string();
     std::fs::write(format!("{}.html", title), html).unwrap();
 }
 
-fn main() {
-    if std::env::args().len() != 2 {
-        println!("Usage: rendoc <file>");
-        std::process::exit(1);
-    }
+fn render_markdown(input: &str) -> String {
+    let parser = Parser::new_ext(input, Options::all());
+    let mut html_output = String::new();
+    html::push_html(&mut html_output, parser);
+    html_output
+}
 
-    let file = std::env::args().nth(1).unwrap();
-    let markup = render_to_markup(&file);
-    save_markup_to_file(markup, &file);
+fn main() {
+    let file = std::env::args().nth(1).expect("Usage: rendoc <file>");
+    save_markup_to_file(render_to_markup(&file), &file);
 }
