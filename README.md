@@ -13,4 +13,4 @@ main modes of operation:
 ## Credits
 links current as of 2024-02-24
 - [maud](https://maud.lambda.xyz/)
-- [comrak](hrzn.ee/kivikakk/comrak)
+- [pulldown-cmark](https://crates.io/crates/pulldown-cmark)
