@@ -1,15 +1,4 @@
-use maud::{html, Markup, PreEscaped, DOCTYPE};
-use pulldown_cmark::{html, Options, Parser};
-
-fn render_to_markup(file: &str) -> Markup {
-    let markdown_input = std::fs::read_to_string(file).unwrap();
-    html! { (PreEscaped(render_markdown(&markdown_input))) }
-}
-
-fn style() -> Markup {
-    html! {
-        style {
-r#"
+<!DOCTYPE html><html><head><title>README</title><style>
 .footnote-definition {
 // display children horizontally
 display: flex;
@@ -66,38 +55,29 @@ pre {
         border-left: 5px solid #586e75; /* Solarized base01 */
     }
 }
-"#
-        }
-    }
-}
-
-fn template(markup: Markup, title: &str) -> Markup {
-    html! {
-        (DOCTYPE)
-        html {
-            head {
-                title { (title) }
-                (style())
-            }
-            body { (markup) }
-        }
-    }
-}
-
-fn save_markup_to_file(markup: Markup, file: &str) {
-    let title = file.rsplit('/').next().unwrap().split('.').next().unwrap();
-    let html = template(markup, title).into_string();
-    std::fs::write(format!("{}.html", title), html).unwrap();
-}
-
-fn render_markdown(input: &str) -> String {
-    let parser = Parser::new_ext(input, Options::all());
-    let mut html_output = String::new();
-    html::push_html(&mut html_output, parser);
-    html_output
-}
-
-fn main() {
-    let file = std::env::args().nth(1).expect("Usage: rendoc <file>");
-    save_markup_to_file(render_to_markup(&file), &file);
-}
+</style></head><body><h1>RENDOC</h1>
+<h2><em>render document</em></h2>
+<p>renders markdown files to html files</p>
+<p><strong>very</strong> opinionated</p>
+<p>main modes of operation:</p>
+<ul>
+<li>render a single file</li>
+<li>FIXME: <del>header links</del></li>
+<li>TODO: render a directory of files</li>
+<li>TODO: render a select number of ‘template’ lists of files
+<ul>
+<li>e.g. README.md, ARCHITECTURE.md is ‘docs’</li>
+</ul>
+</li>
+</ul>
+<p>hi <sup class="footnote-reference"><a href="#1">1</a></sup></p>
+<div class="footnote-definition" id="1"><sup class="footnote-definition-label">1</sup>
+<p><a href="https://maud.lambda.xyz/">maud</a></p>
+</div>
+<h2>Credits</h2>
+<p>links current as of 2024-02-24</p>
+<ul>
+<li><a href="https://maud.lambda.xyz/">maud</a></li>
+<li><a href="hrzn.ee/kivikakk/comrak">comrak</a></li>
+</ul>
+</body></html>
