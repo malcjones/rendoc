@@ -10,6 +10,14 @@ fn style() -> Markup {
     html! {
         style {
 r#"
+a {
+    color: #268bd2; /* Solarized blue */
+}
+
+a:visited {
+    color: #6c71c4; /* Solarized violet */
+}
+
 body {
     font-family: sans-serif;
     color: #073642; /* Solarized base02 for higher contrast */
@@ -27,6 +35,27 @@ pre {
     overflow: auto;
     border-radius: 4px; /* Rounded corners */
     box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.05); /* Slight inner shadow */
+}
+
+@media (prefers-color-scheme: dark) {
+    a {
+        color: #268bd2; /* Solarized blue */
+    }
+
+    a:visited {
+        color: #6c71c4; /* Solarized violet */
+    }
+
+    body {
+        color: #839496; /* Solarized base01 */
+        background-color: #002b36; /* Solarized base03 */
+    }
+
+    pre {
+        background-color: #073642; /* Solarized base02 */
+        color: #93a1a1; /* Solarized base1 */
+        border-left: 5px solid #586e75; /* Solarized base01 */
+    }
 }
 "#
         }
